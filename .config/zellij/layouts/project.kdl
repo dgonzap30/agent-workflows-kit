@@ -1,0 +1,23 @@
+// project layout — the default per-project session.
+//   tab "claude"  resumes this project's last Claude thread in place (or starts fresh),
+//                 then drops to a shell if you quit Claude.
+//   tab "shell"   a plain shell for git / tests / poking around.
+// cwd is inherited from wherever `work` launched it (the project directory).
+layout {
+    // slim 1-line tab/session/mode bar at the top of every tab (no heavy pane boxes)
+    default_tab_template {
+        pane size=1 borderless=true {
+            plugin location="zellij:compact-bar"
+        }
+        children
+    }
+    tab name="claude" focus=true {
+        pane name="claude" {
+            command "zsh"
+            args "-i" "-c" "claude -c 2>/dev/null || claude; exec zsh -i"
+        }
+    }
+    tab name="shell" {
+        pane
+    }
+}

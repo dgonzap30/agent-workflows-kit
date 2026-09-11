@@ -1,0 +1,26 @@
+[plugins."cowork-plugin-management@claude-cowork"]
+enabled = true
+
+[plugins."customer-support@claude-cowork"]
+enabled = true
+
+[plugins."enterprise-search@claude-cowork"]
+enabled = true
+
+[plugins."finance@claude-cowork"]
+enabled = true
+
+[plugins."human-resources@claude-cowork"]
+enabled = true
+
+[plugins."legal@claude-cowork"]
+enabled = true
+
+[plugins."operations@claude-cowork"]
+enabled = true
+
+[plugins."product-management@claude-cowork"]
+enabled = true
+
+[plugins."productivity@claude-cowork"]
+enabled = true

@@ -1,0 +1,102 @@
+# Ghostty — pure black, vivid signal
+# Design: void background, electric palette, one signature accent (magenta cursor),
+# editorial padding, hairline cursor, weightless font.
+
+# ── Color: pure #000 + saturated 16-color ─────────────────────
+background = 000000
+foreground = e8eaed
+cursor-color = ff2bd6
+cursor-text = 000000
+selection-background = 2a0a4a
+selection-foreground = ffffff
+
+# Vivid, fully-saturated. Tuned to ring against pure black, not blend.
+palette = 0=#000000
+palette = 1=#ff3366
+palette = 2=#00ff95
+palette = 3=#ffd60a
+palette = 4=#3b82ff
+palette = 5=#d946ef
+palette = 6=#00e5ff
+palette = 7=#e8eaed
+palette = 8=#3a3a44
+palette = 9=#ff5e8a
+palette = 10=#5cff9f
+palette = 11=#ffe14d
+palette = 12=#6ba1ff
+palette = 13=#e879f9
+palette = 14=#5eead4
+palette = 15=#ffffff
+
+bold-color = ffffff
+bold-is-bright = false
+window-colorspace = display-p3
+
+# ── Font: Monaspace, ultra-light, mixed textures ──────────────
+font-family = Monaspace Neon
+font-family-bold = Monaspace Neon
+font-family-italic = Monaspace Radon
+font-family-bold-italic = Monaspace Krypton
+font-style = ExtraLight
+font-style-bold = Medium
+font-style-italic = Light
+font-style-bold-italic = Medium
+font-size = 13
+adjust-cell-height = 8%
+adjust-cell-width = 1%
+font-thicken = false
+font-feature = +calt
+font-feature = +liga
+font-feature = +ss01
+font-feature = +ss02
+font-feature = +ss03
+font-feature = +ss05
+font-feature = +ss06
+font-feature = +ss08
+
+# ── Window: editorial, frameless ──────────────────────────────
+window-padding-x = 28
+window-padding-y = 22
+window-padding-balance = true
+window-padding-color = background
+macos-titlebar-style = transparent
+macos-titlebar-proxy-icon = hidden
+macos-window-shadow = true
+macos-icon = chalkboard
+window-save-state = always
+unfocused-split-opacity = 0.5
+unfocused-split-fill = 000000
+resize-overlay = never
+
+# ── Cursor: hairline bar, signature magenta ───────────────────
+cursor-style = bar
+cursor-style-blink = false
+cursor-opacity = 1.0
+
+# ── No translucency: pure black is pure black ─────────────────
+background-opacity = 1.0
+background-blur = 0
+
+# ── Mouse / interaction ───────────────────────────────────────
+mouse-hide-while-typing = true
+copy-on-select = clipboard
+confirm-close-surface = false
+# Slower, more controllable scroll (default 1.0 felt too fast in TUI apps)
+mouse-scroll-multiplier = 0.6
+
+# ── Shell integration (richer prompt awareness) ───────────────
+shell-integration = detect
+shell-integration-features = cursor,sudo,title
+
+# ── Misc ──────────────────────────────────────────────────────
+scrollback-limit = 100000000
+clipboard-read = allow
+clipboard-write = allow
+clipboard-trim-trailing-spaces = true
+link-url = true
+
+keybind = ctrl+shift+up=jump_to_prompt:-1
+keybind = ctrl+shift+down=jump_to_prompt:1
+
+# right Option = Alt so zellij Alt-keybinds fire (Alt+w worker); left Option still types á/ñ
+macos-option-as-alt = right

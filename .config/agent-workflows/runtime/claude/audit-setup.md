@@ -1,0 +1,6 @@
+---
+description: Audit current agent configuration and workflow overhead using bounded local evidence and current official model guidance.
+allowed-tools: Bash, Read, Grep, Glob, WebFetch, WebSearch, Write
+---
+
+Read the nearest project policy and any supplied recent audit. Inventory effective runtime configuration, instruction sources, installed/enabled plugins, skill metadata, hooks, model resolution, and ownership. Use the existing install-agent-workflows --check and agent-catalog-check instruments; distinguish each host and scope. Inspect changed areas first. A fresh full audit is appropriate when requested or the baseline no longer covers the objective. Follow the shared worker cap; do not multiply dimensions by reviewer panels. Never read credential values or export private command arguments. Use synthetic fixtures for permission behavior and report source findings separately from native runtime proof. Produce a prioritized, source-backed plan with measured versus unmeasured costs. Audit-only requests do not authorize activation; an explicit subsequent approval does. Make changes through the versioned policy/installer with rollback and concurrent-drift checks, not vendor cache edits.

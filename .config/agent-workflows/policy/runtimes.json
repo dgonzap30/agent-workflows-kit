@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "runtimes": [
+    {
+      "name": "Codex",
+      "file": ".codex/AGENTS.md",
+      "replacements": {
+        "RUNTIME_NAME": "Codex",
+        "PROJECT_INSTRUCTIONS": "AGENTS.md or CLAUDE.md",
+        "LONG_RUN_SKILL": "$long-run",
+        "UNLAZY_SKILL": "$unlazy",
+        "PLAN_MIRROR_RULE": "`update_plan` is its UI mirror; rebuild it from disk after resume, never the reverse.",
+        "GOAL_RULE": "Create a native Goal only when the user explicitly requests a goal or an explicit long/autonomous outcome with a measurable terminal condition. Keep detail in the durable plan, do not create Goals for ordinary tasks, and mark one complete only after its terminal condition is proved.",
+        "RUNTIME_HYGIENE": "- Use native task tools for lifecycle changes and honor manual titles. Keep routine task naming lightweight; reserve catalog-wide curator runs for actual organization work. Astra benefits from explicit authority carryover, selective skills, and proportionate verification.",
+        "OWNER_SUFFIX": "",
+        "OWNER_LABEL": "The owner",
+        "WORKSPACE_MAP_RULE": ""
+      }
+    },
+    {
+      "name": "Claude Code",
+      "file": ".claude/CLAUDE.md",
+      "replacements": {
+        "RUNTIME_NAME": "Claude Code",
+        "PROJECT_INSTRUCTIONS": "CLAUDE.md or AGENTS.md",
+        "LONG_RUN_SKILL": "/long-run",
+        "UNLAZY_SKILL": "/unlazy",
+        "PLAN_MIRROR_RULE": "Native tasks are its UI mirror; rebuild them from disk after resume, never the reverse.",
+        "GOAL_RULE": "Use `/goal` only for a user-requested walk-away verification condition. The durable long-run plan remains the detailed source of truth; do not infer a Goal for ordinary work.",
+        "RUNTIME_HYGIENE": "- Request brief visible progress updates, batch independent tool calls, preserve exact constraints through compaction, and keep changes within scope. Fable effort and cache behavior are runtime-specific; preserve the current main settings unless a change is authorized.",
+        "OWNER_SUFFIX": "",
+        "OWNER_LABEL": "The owner",
+        "WORKSPACE_MAP_RULE": ""
+      }
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "set": {
+    "enabledPlugins.posthog@claude-plugins-official": false,
+    "remoteControlAtStartup": true,
+    "skipDangerousModePermissionPrompt": false,
+    "env.CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
+    "enabledPlugins.security-guidance@claude-plugins-official": false,
+    "enabledPlugins.claude-code-setup@claude-plugins-official": false,
+    "enabledPlugins.session-report@claude-plugins-official": false,
+    "enabledPlugins.sentry-cli@claude-plugins-official": false,
+    "askUserQuestionTimeout": 1800,
+    "enabledPlugins.superpowers@claude-plugins-official": false,
+    "autoMode.environment": [
+      "$defaults"
+    ],
+    "autoMode.allow": [
+      "$defaults"
+    ]
+  },
+  "delete": [
+    "env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS",
+    "env.SECURITY_REVIEW_MODEL",
+    "env.SG_AGENTIC_MODEL",
+    "modelSettings.claude-fable-5",
+    "skillOverrides.gstack",
+    "extraKnownMarketplaces.claude-community"
+  ],
+  "preserve": [
+    "permissions.defaultMode",
+    "skipAutoPermissionPrompt",
+    "effortLevel",
+    "model"
+  ],
+  "replaceCommands": [
+    {
+      "from": "bash ~/.claude/scripts/hooks/prompt-gate.sh",
+      "to": "bash ~/.config/agent-workflows/hooks/prompt-gate.sh --runtime claude"
+    }
+  ],
+  "forbidCommands": [
+    {
+      "events": [
+        "PreToolUse",
+        "PostToolUse",
+        "PostToolUseFailure"
+      ],
+      "contains": "OpenIslandHooks"
+    },
+    {
+      "events": [
+        "PermissionRequest"
+      ],
+      "contains": "auto-approve-reads.sh"
+    }
+  ],
+  "asyncCommands": [
+    {
+      "events": [
+        "SessionEnd",
+        "Stop",
+        "StopFailure",
+        "SubagentStart",
+        "SubagentStop",
+        "UserPromptSubmit"
+      ],
+      "contains": "OpenIslandHooks"
+    }
+  ],
+  "syncRequiredCommands": [
+    "auto-format.sh",
+    "completion-guard.sh",
+    "config-protection.sh",
+    "fanout-pressure-guard.sh",
+    "git-guard.sh",
+    "path-guard.sh",
+    "prompt-gate.sh"
+  ],
+  "removeAllow": [
+    "Bash(cat:*)",
+    "Bash(env)",
+    "Bash(printenv:*)"
+  ]
+}

@@ -1,0 +1,32 @@
+// zellij config.
+//
+// Transparent to Claude Code: zellij's own keys are Ctrl-based, so they never clash with
+// your ⌘ Ghostty binds. The few Ctrl keys it reserves (Ctrl+p pane / Ctrl+t tab /
+// Ctrl+o session / Ctrl+n resize / Ctrl+s scroll) are the whole surface to learn.
+//
+// Escape hatch for TUI key collisions: Ctrl+g LOCKS zellij (every key passes straight to
+// Claude); Ctrl+g again unlocks. Detach a session without killing it: Ctrl+o then d.
+
+default_shell "zsh"
+pane_frames false          // no boxy per-pane borders; a slim compact-bar in the layouts shows tabs
+mouse_mode true
+copy_on_select true
+
+// Survive a zellij server restart (reboot): reload the layout + last viewport on attach.
+session_serialization true
+serialize_pane_viewport true
+
+// pane frames are off (see above) — no frame styling needed.
+
+keybinds {
+    // One-key worker: open a NEW tab running a fresh Claude in the current project dir.
+    // Alt+w works from anywhere (incl. while Claude is focused). Needs Ghostty
+    // `macos-option-as-alt = right` (set in ghostty/config) so right-Option registers as Alt.
+    shared_except "locked" {
+        bind "Alt w" { NewTab { layout "worker"; }; }
+    }
+    // No-config fallback that always works on macOS: Ctrl+t then w.
+    tab {
+        bind "w" { NewTab { layout "worker"; }; SwitchToMode "Normal"; }
+    }
+}

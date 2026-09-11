@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "set": {},
+  "delete": [],
+  "preserve": [
+    "model",
+    "effortLevel",
+    "permissions.defaultMode"
+  ],
+  "removeAllow": [],
+  "forbidCommands": [],
+  "asyncCommands": [],
+  "syncRequiredCommands": [],
+  "replaceCommands": []
+}

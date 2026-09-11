@@ -1,0 +1,16 @@
+# work — project registry.   Columns:   slug   absolute-path   [layout]
+#
+# `work <slug>` opens (or attaches) a zellij session named <slug>, rooted at the path,
+# using the named layout in ~/.config/zellij/layouts/ (defaults to "project").
+# Anything NOT listed here is still reachable by name/dir via zoxide in the `work` picker.
+# Slugs must be [A-Za-z0-9_-].  Edit this file with:  work edit
+#
+# Copy this file to `projects` and replace the rows with your own. The real
+# registry is gitignored, because it names your machine's paths and projects.
+#
+# slug            path                                            layout
+
+hq                $HOME/dev                                       hq
+web-app           $HOME/dev/web-app                               project
+api               $HOME/dev/api                                   project
+notes             $HOME/notes                                     project

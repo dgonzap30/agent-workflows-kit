@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+# work — canonical per-project zellij sessionizer for Claude Code.
+# One named zellij session per project; fuzzy switch; no sprawl.
+#
+#   work                 fuzzy-pick a project (live sessions first, then registry, then zoxide)
+#   work <slug|dir>      jump straight to a project's session (attach if live, else create)
+#   work ls              print the session board (live sessions + registry)
+#   work kill <slug>     kill / forget a session
+#   work edit            edit the project registry
+#   work --dry <q>       resolve <q> and print what would happen (no launch) — for testing
+#   work -h              this help
+#
+# Registry:  ~/.config/work/projects        (slug  abs-path  [layout])
+# Layouts:   ~/.config/zellij/layouts/{project,hq}.kdl
+# Written for macOS system bash 3.2 — keep it 3.2-safe (no assoc arrays, guard empty arrays).
+set -uo pipefail
+
+REGISTRY="${WORK_REGISTRY:-$HOME/.config/work/projects}"
+LAYOUT_DIR="${WORK_LAYOUT_DIR:-$HOME/.config/zellij/layouts}"
+
+die() { printf 'work: %s\n' "$*" >&2; exit 1; }
+
+# zellij session names must be [A-Za-z0-9_-]; collapse anything else to '-'.
+slugify() { printf '%s' "$1" | tr -c 'A-Za-z0-9_-' '-' | sed -E 's/-+/-/g; s/^-//; s/-$//'; }
+
+# Plain list of existing session names (running + resurrectable/exited).
+sessions_live() { zellij list-sessions -n 2>/dev/null | awk 'NF{print $1}'; }
+session_exists() { sessions_live | grep -qx "$(slugify "$1")"; }
+
+# Resolve a query -> "slug<TAB>dir<TAB>layout". Registry first, then a literal dir, then zoxide.
+resolve() {
+  local q="$1" dir lay
+  read -r dir lay < <(awk -v q="$q" '!/^[[:space:]]*#/ && $1==q {print $2, ($3==""?"project":$3); exit}' "$REGISTRY" 2>/dev/null)
+  if [ -n "${dir:-}" ]; then
+    printf '%s\t%s\t%s' "$(slugify "$q")" "$dir" "${lay:-project}"; return 0
+  fi
+  if [ -d "$q" ]; then dir="$q"; else dir="$(zoxide query "$q" 2>/dev/null)"; fi
+  [ -n "${dir:-}" ] && [ -d "$dir" ] || return 1
+  printf '%s\t%s\t%s' "$(slugify "$(basename "$dir")")" "$dir" "project"
+}
+
+# Create-or-attach a zellij session. Args: slug dir layout  (dir/layout unused when already live).
+launch() {
+  local slug dir lay layout_path
+  slug="$(slugify "$1")"; dir="${2:-}"; lay="${3:-project}"
+  if [ -n "${ZELLIJ:-}" ]; then
+    [ "${ZELLIJ_SESSION_NAME:-}" = "$slug" ] && return 0
+    die "you're inside zellij session '${ZELLIJ_SESSION_NAME:-?}'. Detach first (Ctrl+o then d), then: work $slug"
+  fi
+  if session_exists "$slug"; then exec zellij attach "$slug"; fi
+  [ -n "$dir" ] && [ -d "$dir" ] || die "no directory for '$slug' (not live, not in registry, not a known dir)"
+  layout_path="$LAYOUT_DIR/$lay.kdl"; [ -f "$layout_path" ] || layout_path="$LAYOUT_DIR/project.kdl"
+  cd "$dir" || die "cannot cd: $dir"
+  # --new-session-with-layout (not --layout): with a session name, --layout means "add tabs
+  # to an existing session"; -n unambiguously creates a NEW named session with this layout.
+  exec zellij --session "$slug" --new-session-with-layout "$layout_path"
+}
+
+# Turn a query into a launch (attach if the session is already live, else resolve + create).
+go() {
+  local q="$1" r slug dir lay
+  if session_exists "$q"; then launch "$q"; return; fi
+  r="$(resolve "$q")" || die "unknown project: $q  (try 'work' to pick, or 'work edit')"
+  IFS=$'\t' read -r slug dir lay <<<"$r"
+  launch "$slug" "$dir" "$lay"
+}
+
+# Rows for the fzf picker.  field1 = slug (returned); field2 = display column.
+picker_rows() {
+  local live seen s slug dir lay sl
+  live="$(sessions_live)"
+  printf '%s\n' "$live" | while IFS= read -r s; do
+    [ -n "$s" ] && printf '%s\t\033[38;2;0;255;149m●\033[0m %s\n' "$s" "$s"
+  done
+  grep -v '^[[:space:]]*#' "$REGISTRY" 2>/dev/null | while read -r slug dir lay; do
+    [ -z "${slug:-}" ] && continue
+    printf '%s\n' "$live" | grep -qx "$(slugify "$slug")" && continue
+    printf '%s\t  %-16s \033[38;5;244m%s\033[0m\n' "$slug" "$slug" "${dir/#$HOME/~}"
+  done
+  seen="$(grep -v '^[[:space:]]*#' "$REGISTRY" 2>/dev/null | awk 'NF{print $1}')"
+  zoxide query -l 2>/dev/null | head -40 | while IFS= read -r dir; do
+    [ -d "$dir" ] || continue
+    sl="$(slugify "$(basename "$dir")")"
+    printf '%s\n' "$seen" | grep -qx "$sl" && continue
+    printf '%s\n' "$live" | grep -qx "$sl" && continue
+    printf '%s\t  %-16s \033[38;5;240m%s (z)\033[0m\n' "$sl" "$sl" "${dir/#$HOME/~}"
+  done
+}
+
+pick() {
+  command -v fzf >/dev/null 2>&1 || die "fzf not found (needed for the picker). Use: work <slug>"
+  local sel slug
+  sel="$(picker_rows | fzf --ansi --delimiter=$'\t' --with-nth=2 \
+        --prompt='work ▸ ' --height=45% --reverse --no-multi \
+        --header='● live   ·   enter = open   ·   esc = plain shell')" || return 0
+  slug="$(printf '%s' "$sel" | cut -f1)"
+  [ -n "$slug" ] && go "$slug"
+}
+
+board() {
+  local live slug dir lay mark
+  live="$(sessions_live)"
+  printf '\033[1mLive sessions\033[0m\n'
+  if [ -n "$live" ]; then zellij list-sessions 2>/dev/null | sed 's/^/  /'; else printf '  (none)\n'; fi
+  printf '\n\033[1mProjects\033[0m   \033[38;5;244m(work <slug>)\033[0m\n'
+  grep -v '^[[:space:]]*#' "$REGISTRY" 2>/dev/null | while read -r slug dir lay; do
+    [ -z "${slug:-}" ] && continue
+    mark='  '; printf '%s\n' "$live" | grep -qx "$(slugify "$slug")" && mark='\033[38;2;0;255;149m● \033[0m'
+    printf "  %b%-16s \033[38;5;244m%s\033[0m\n" "$mark" "$slug" "${dir/#$HOME/~}"
+  done
+}
+
+kill_session() {
+  local slug; slug="$(slugify "$1")"
+  zellij kill-session "$slug" 2>/dev/null
+  zellij delete-session "$slug" 2>/dev/null
+  printf 'work: killed %s\n' "$slug"
+}
+
+[ -f "$REGISTRY" ] || die "registry not found: $REGISTRY"
+
+cmd="${1:-}"
+case "$cmd" in
+  ''|-p|--pick)   pick ;;
+  ls|list)        board ;;
+  edit)           exec "${EDITOR:-vi}" "$REGISTRY" ;;
+  kill|-k)        shift; [ -n "${1:-}" ] || die "usage: work kill <slug>"; kill_session "$1" ;;
+  --dry)          shift; [ -n "${1:-}" ] || die "usage: work --dry <query>"
+                  dry="$(resolve "$1")" || die "unresolved: $1"; printf '%s\n' "$dry" | tr '\t' ' ' ;;
+  -h|--help)      sed -n '2,20p' "$0" ;;
+  *)              go "$cmd" ;;
+esac

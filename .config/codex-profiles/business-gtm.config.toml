@@ -1,0 +1,17 @@
+[plugins."apollo@claude-cowork"]
+enabled = true
+
+[plugins."brand-voice@claude-cowork"]
+enabled = true
+
+[plugins."common-room@claude-cowork"]
+enabled = true
+
+[plugins."marketing@claude-cowork"]
+enabled = true
+
+[plugins."sales@claude-cowork"]
+enabled = true
+
+[plugins."slack-by-salesforce@claude-cowork"]
+enabled = true

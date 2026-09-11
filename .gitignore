@@ -1,0 +1,33 @@
+# Sensitive — never commit
+.ssh/config
+.ssh/id_*
+.ssh/known_hosts
+*.key
+*.pem
+*.p12
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Machine-specific state — copy the .example files and keep yours local
+.config/work/projects
+.config/agent-workflows/policy/claude-settings.json
+.config/agent-workflows/policy/codex-config.json
+.config/agent-workflows/backups/
+.config/agent-workflows/releases/
+.config/agent-workflows/install-state.json
+.zshrc.local
+.config/agent-workflows/policy/owner.json
+
+# Codex profiles that list one machine's skill inventory
+.config/codex-profiles/design.config.toml
+.config/codex-profiles/engineering-extra.config.toml
+.config/codex-profiles/infra.config.toml
+.config/codex-profiles/macos.config.toml
+.config/codex-profiles/mobile.config.toml
+.config/codex-profiles/personal-creative.config.toml
+.config/codex-profiles/research.config.toml

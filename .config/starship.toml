@@ -1,0 +1,79 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Flat, Pure-inspired. One accent: hacker green on the prompt character.
+# Everything else is intentionally dim so the green ❯ pops.
+
+add_newline = true
+
+format = """
+$directory\
+$git_branch\
+$git_state\
+$git_status\
+$cmd_duration\
+$line_break\
+$character"""
+
+[directory]
+style = "#7aa2f7"
+truncation_length = 3
+truncate_to_repo = false
+read_only = " 󰌾"
+read_only_style = "#ff5c57"
+format = "[$path]($style)[$read_only]($read_only_style) "
+
+[character]
+success_symbol = "[❯](bold #00ff88)"
+error_symbol   = "[❯](bold #ff5c57)"
+vicmd_symbol   = "[❮](bold #00ff88)"
+
+[git_branch]
+format = "[ $branch]($style)"
+style = "#5c6370"
+symbol = ""
+
+[git_status]
+format = "[$all_status$ahead_behind]($style) "
+style = "#e5c07b"
+conflicted = "="
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+up_to_date = ""
+untracked = "?"
+stashed = "\\$"
+modified = "!"
+staged = "+"
+renamed = "»"
+deleted = "✘"
+
+[git_state]
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+style = "#5c6370"
+
+[cmd_duration]
+min_time = 2_000
+format = "[ $duration]($style)"
+style = "#5c6370"
+
+# --- Noise off: one accent, nothing else
+[username]
+disabled = true
+[hostname]
+disabled = true
+[package]
+disabled = true
+[nodejs]
+disabled = true
+[bun]
+disabled = true
+[deno]
+disabled = true
+[python]
+disabled = true
+[rust]
+disabled = true
+[golang]
+disabled = true
+[time]
+disabled = true

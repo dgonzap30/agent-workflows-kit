@@ -1,0 +1,28 @@
+// hq layout — your home base (rooted at ~/dev).
+//   left   orchestrator Claude (resumes the last ~/dev thread, or starts fresh)
+//   right  a live session board (`work ls`) so you can see every project at a glance
+//   tab 2  a scratch shell
+layout {
+    // slim 1-line tab/session/mode bar at the top of every tab (no heavy pane boxes)
+    default_tab_template {
+        pane size=1 borderless=true {
+            plugin location="zellij:compact-bar"
+        }
+        children
+    }
+    tab name="hq" focus=true {
+        pane split_direction="vertical" {
+            pane name="orchestrator" size="62%" {
+                command "zsh"
+                args "-i" "-c" "claude -c 2>/dev/null || claude; exec zsh -i"
+            }
+            pane name="board" size="38%" {
+                command "zsh"
+                args "-i" "-c" "work ls; exec zsh -i"
+            }
+        }
+    }
+    tab name="scratch" {
+        pane
+    }
+}

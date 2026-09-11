@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "removeProjectTrustPaths": [
+    "/example/workspaces/2026-01-01/retired-alpha",
+    "/example/workspaces/2026-01-01/retired-beta",
+    "/example/workspaces/2026-01-02/retired-delta",
+    "/example/workspaces/2026-01-02/retired-gamma",
+    "/example/workspaces/2026-01-03/retired-epsilon"
+  ],
+  "enabledSections": {
+    "[plugins.\"superpowers@claude-plugins-official\"]": false,
+    "[mcp_servers.shadcn]": false,
+    "[mcp_servers.fal-ai]": false
+  }
+}

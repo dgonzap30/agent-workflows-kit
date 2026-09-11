@@ -1,0 +1,18 @@
+// worker layout — a fresh Claude instance in a new tab, in the current project's cwd.
+// Opened by the one-key worker binding (Alt+w, or Ctrl+t then w). Runs a fresh `claude`
+// (NOT `claude -c`), so it's an independent thread from the tab you were on — the
+// orchestrator ▏ worker pattern, kept inside the one project session.
+layout {
+    default_tab_template {
+        pane size=1 borderless=true {
+            plugin location="zellij:compact-bar"
+        }
+        children
+    }
+    tab name="worker" {
+        pane name="worker" {
+            command "zsh"
+            args "-i" "-c" "claude; exec zsh -i"
+        }
+    }
+}

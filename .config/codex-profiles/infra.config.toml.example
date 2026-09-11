@@ -1,0 +1,12 @@
+# Example Codex profile: infra
+#
+# Copy to infra.config.toml and list the skills you actually have. The real
+# file is gitignored because it is an inventory of one machine's skills.
+#
+# Each entry is a path to a SKILL.md. $SKILLS_ROOT is wherever you keep them.
+
+[[skills.config]]
+path = "$SKILLS_ROOT/example-skill-one/SKILL.md"
+
+[[skills.config]]
+path = "$SKILLS_ROOT/example-skill-two/SKILL.md"

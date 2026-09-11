@@ -1,0 +1,11 @@
+[plugins."stripe@claude-plugins-official"]
+enabled = true
+
+[plugins."redis-development@claude-plugins-official"]
+enabled = true
+
+[plugins."render@claude-plugins-official"]
+enabled = true
+
+[mcp_servers.shadcn]
+enabled = true

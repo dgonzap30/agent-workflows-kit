@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "files": [
+    {
+      "file": "AGENTS.md",
+      "source": "runtime/claude/home-agents.md",
+      "portable": true
+    },
+    {
+      "file": ".claude/agents/planner.md",
+      "source": "runtime/claude/planner.md",
+      "portable": true
+    },
+    {
+      "file": ".claude/agents/worker.md",
+      "source": "runtime/claude/worker.md",
+      "portable": true
+    },
+    {
+      "file": ".claude/workflows/_tiers.preamble.js",
+      "source": "runtime/claude/tiers.js"
+    },
+    {
+      "file": ".claude/statusline-command.sh",
+      "source": "runtime/claude/statusline-command.sh"
+    },
+    {
+      "file": ".claude/skills/orchestration/SKILL.md",
+      "source": "runtime/claude/orchestration.md",
+      "portable": true
+    },
+    {
+      "file": ".claude/skills/retire/SKILL.md",
+      "source": "runtime/claude/retire.md",
+      "portable": true
+    },
+    {
+      "file": ".claude/skills/stating-current-state/SKILL.md",
+      "source": "runtime/claude/stating-current-state.md",
+      "portable": true
+    },
+    {
+      "file": ".agents/skills/planning/SKILL.md",
+      "source": "runtime/claude/planning.md",
+      "portable": true
+    },
+    {
+      "file": ".claude/scripts/hooks/auto-approve-reads.sh",
+      "source": "runtime/claude/auto-approve-reads.sh"
+    },
+    {
+      "file": ".codex/scripts/hooks/destructive-command-block.sh",
+      "source": "runtime/claude/destructive-command-block.sh"
+    },
+    {
+      "file": ".claude/scripts/hooks/git-guard.sh",
+      "source": "runtime/claude/git-guard.sh"
+    },
+    {
+      "file": ".claude/commands/audit-setup.md",
+      "source": "runtime/claude/audit-setup.md"
+    },
+    {
+      "file": ".claude/scripts/hooks/stop-name-refresh.sh",
+      "source": "runtime/claude/stop-name-refresh.sh"
+    },
+    {
+      "file": ".agents/skills/design-stack/SKILL.md",
+      "source": "runtime/claude/design-stack.md"
+    },
+    {
+      "file": ".agents/skills/verification-loop/SKILL.md",
+      "source": "runtime/claude/verification-loop.md",
+      "portable": true
+    },
+    {
+      "file": ".agents/skills/verification-loop/references/verification-examples.md",
+      "source": "runtime/claude/references/verification-examples.md",
+      "portable": true
+    },
+    {
+      "file": ".agents/skills/quick-review/SKILL.md",
+      "source": "runtime/claude/quick-review.md",
+      "portable": true
+    },
+    {
+      "file": ".agents/skills/quick-review/references/review-evidence.md",
+      "source": "runtime/claude/references/review-evidence.md",
+      "portable": true
+    },
+    {
+      "file": ".claude/skills/verification-loop/SKILL.md",
+      "source": "runtime/claude/verification-loop.md",
+      "portable": true
+    },
+    {
+      "file": ".claude/skills/verification-loop/references/verification-examples.md",
+      "source": "runtime/claude/references/verification-examples.md",
+      "portable": true
+    },
+    {
+      "file": ".claude/skills/quick-review/SKILL.md",
+      "source": "runtime/claude/quick-review.md",
+      "portable": true
+    },
+    {
+      "file": ".claude/skills/quick-review/references/review-evidence.md",
+      "source": "runtime/claude/references/review-evidence.md",
+      "portable": true
+    },
+    {
+      "file": ".codex/skills/gh-fix-ci/SKILL.md",
+      "source": "runtime/claude/gh-fix-ci.md"
+    },
+    {
+      "file": ".claude/rules/code-quality.md",
+      "source": "runtime/claude/rules/code-quality.md",
+      "portable": true
+    },
+    {
+      "file": ".claude/rules/react-native.md",
+      "source": "runtime/claude/rules/react-native.md",
+      "portable": true
+    },
+    {
+      "file": ".claude/rules/testing.md",
+      "source": "runtime/claude/rules/testing.md",
+      "portable": true
+    },
+    {
+      "file": ".claude/rules/sql-supabase.md",
+      "source": "runtime/claude/rules/sql-supabase.md",
+      "portable": true
+    },
+    {
+      "file": ".claude/rules/react.md",
+      "source": "runtime/claude/rules/react.md",
+      "portable": true
+    },
+    {
+      "file": ".claude/rules/ui-quality.md",
+      "source": "runtime/claude/rules/ui-quality.md",
+      "portable": true
+    },
+    {
+      "file": ".claude/rules/typescript.md",
+      "source": "runtime/claude/rules/typescript.md",
+      "portable": true
+    },
+    {
+      "file": ".claude/scripts/hooks/git-context.sh",
+      "source": "runtime/claude/git-context.sh"
+    }
+  ],
+  "transforms": [
+    {
+      "file": ".zshrc",
+      "kind": "remove-line-prefixes",
+      "prefixes": [
+        "alias claude-dev='claude --append-system-prompt",
+        "alias claude-review='claude --append-system-prompt",
+        "alias claude-ai='claude --append-system-prompt",
+        "alias claude-debug='claude --append-system-prompt"
+      ]
+    }
+  ]
+}

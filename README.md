@@ -151,3 +151,69 @@ Desktop installs include scoped profiles, local skills, rules, and host-specific
 Before a release: refresh the manifest for every managed source and linked profile/command, run the workflow/catalog test suites, commit named files, and create a read-only snapshot of that commit. Install it with the explicitly expected `--previous-source` when relocating existing links. The installer creates owner-only rollback bundles and refuses concurrent target drift. Do not copy a desktop user's config onto a headless host.
 
 The main model defaults are deliberate user settings. Benchmark results may justify selectable presets; they do not authorize silently changing active work. Repository-derived evaluation data must have explicit approval for any external model destinations before submission.
+
+### Kit version
+
+`.config/agent-workflows/VERSION` is the kit's own semver, independent of `manifest.json`'s `"version": 2` (that number is the manifest *schema*, not a release). Changes are recorded in `.config/agent-workflows/CHANGELOG.md`. Bump VERSION and add a changelog entry whenever a release changes hook behavior, adds/removes a managed file, or changes the installer's `--check`/`--install` contract.
+
+### Required interpreters
+
+`.config/agent-workflows/policy/runtimes.json` pins minimum interpreter versions under its `interpreters` key (bash, python3, node, bun) — the versions the kit's hook scripts and installer are written against. `install-agent-workflows.mjs --check` verifies these first, before manifest hashes or settings validity, and fails with a named interpreter/version if one is missing or too old. This check never installs anything.
+
+### `--check` mode
+
+`node .local/bin/install-agent-workflows.mjs --check [--home <path>] [--source <path>]` is fully read-only: it verifies (1) required interpreters are on PATH and meet `runtimes.json`'s minimums, (2) every file the source manifest lists exists at the hash `manifest.json` records, (3) the source's managed-file inventory exactly matches the manifest (nothing added or removed without a manifest refresh), (4) the target's Claude settings and Codex config normalize to the same policy projection the last `--install` recorded (no drift), and (5) no managed symlink has been retargeted. It exits non-zero and names the first failure; it never writes to `--home`. Use `--source` to check a different checkout (e.g. a branch under review) against a `--home` you don't intend to touch.
+
+### Claude Code hook inventory
+
+`.config/agent-workflows/runtime/claude/` versions the Claude Code hook scripts that `policy/claude-settings.json` references by name (`replaceCommands`, `forbidCommands`, `asyncCommands`, `syncRequiredCommands`), each with a `node:test` regression test covering at least one allow and one block/nudge case:
+
+| Script | Role |
+|---|---|
+| `prompt-gate.sh` (in `hooks/`, cross-runtime) | UserPromptSubmit — long-run lifecycle nudge |
+| `auto-approve-reads.sh` | retired compatibility no-op; native permission engine now owns this |
+| `session-budget.sh` | UserPromptSubmit — session-size/correction advisory (see below) |
+| `auto-format.sh` | PostToolUse — Prettier on edited files when a local binary exists |
+| `completion-guard.sh` (+ `completion-guard.py`) | Stop — flags claimed-but-unverified completions |
+| `config-protection.sh` | PreToolUse — blocks self-edits to global Claude config |
+| `fanout-pressure-guard.sh` | PreToolUse (Task/Agent/Workflow) — blocks new agent fan-out under swap pressure |
+| `git-guard.sh` (+ `lib/git-policy-lib.sh`) | PreToolUse/Bash — blocks edits/commits on a protected branch |
+
+`git-context.sh` and `stop-name-refresh.sh` are also versioned here even though `policy/claude-settings.json` doesn't name them directly — both are genuinely installer-managed via `policy/assets.json`, which copies them onto the live host on `--install`.
+
+`git-guard.sh`'s kit copy differs from the live one by a single sanitized comment line (the maintainer name → `the owner`, part of this repo's owner-identity scrub) — cosmetic, not decision logic; the live script's actual behavior is unchanged from what's versioned here.
+
+### Personal hook layer (`local/claude-hooks/`)
+
+17 more scripts live at `~/.claude/scripts/hooks/` (plus `helm-emit.sh`,
+which lives in the separate `helm` repo) but are genuinely host-local — not
+referenced by `policy/claude-settings.json` or `policy/assets.json`, and not
+generalizable kit behavior: `bash-shape-guard.sh`, `commit-quality.sh`,
+`dev-server-block.sh`, `env-protection.sh`, `frozen-repo-guard.sh`,
+`gh-repo-guard.sh`, `inject-stack-rules.sh`, `judge.py`,
+`pre-compact-backup.sh`, `project-inventory-guard.sh`, `rules-probe.sh`,
+`session-label.sh`, `session-name-gen.sh`, `session-reap.sh`,
+`session-start-title.sh`, `task-completed-tsc.sh`, `helm-emit.sh`. These are
+versioned byte-identical, each with a `node:test` regression test, in
+`local/claude-hooks/` — the personal/local layer, tracked in git but outside
+`.config/agent-workflows/` (the kit's `managedRoot`), so the installer never
+walks or manages them and the `publish/agent-workflows-kit` export never
+carries them. See `local/claude-hooks/README.md`. Run their tests with
+`node --test local/claude-hooks/*.test.mjs`.
+
+### `session-budget.sh` thresholds
+
+UserPromptSubmit gate on session size. Always prints one unconditional hygiene line (`ps`-derived session count/RAM + `vm.swapusage` swap %); the budget tiers below are additional and conditional. All are env-overridable per session, never edited in place:
+
+| Env var | Default | Meaning |
+|---|---|---|
+| `SESSION_BUDGET_OFF` | unset | any value disables the whole hook |
+| `SESSION_BUDGET_SOFT_CTX` | `300000` | context tokens (input+cache) that trip the soft tier |
+| `SESSION_BUDGET_HARD_CTX` | `600000` | context tokens that trip the hard (retire) tier |
+| `SESSION_BUDGET_SOFT_MB` | `12` | transcript size (MB) that trips soft regardless of context |
+| `SESSION_BUDGET_HARD_MB` | `25` | transcript size (MB) that trips hard regardless of context |
+| `SESSION_BUDGET_MIN_MB` | `5` | minimum transcript size before the *context* thresholds count (avoids flagging one dense prompt) |
+| `SESSION_BUDGET_CORR_WINDOW` | `12` | how many recent human turns are scanned for correction language |
+| `SESSION_BUDGET_CORR_MIN` | `2` | correction hits in that window that trip the quality tier independently of size |
+
+Slash-commands and bash-bangs (`prompt` starting with `/`, `#`, or `!`) skip the budget tiers entirely (only the hygiene line prints). Hard tier tells the model to retire via `/retire`; soft tier tells it to checkpoint, not split mid-task, and offers `/rewind` "Summarize from here" for a resolved detour. A hit is logged to `~/.claude/logs/session-budget.log`.

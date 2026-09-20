@@ -1,5 +1,11 @@
 {
   "version": 1,
+  "interpreters": {
+    "bash": ">=3.2",
+    "python3": ">=3.9",
+    "node": ">=18.0.0",
+    "bun": ">=1.0.0"
+  },
   "runtimes": [
     {
       "name": "Codex",

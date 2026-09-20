@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { spawnSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
 import {
   chmod,
@@ -184,6 +185,48 @@ async function verifyManifest(source) {
     throw new Error('source inventory differs from the manifest');
   }
   return manifest;
+}
+
+// --check pins the interpreters these scripts assume (policy/runtimes.json "interpreters"),
+// so a host missing bash/python3/node/bun — or running one too old for the syntax the kit's
+// hooks actually use — fails loudly instead of silently no-op'ing every guard.
+function parseVersionSpec(spec) {
+  const match = /(\d+)\.(\d+)(?:\.(\d+))?/.exec(spec ?? '');
+  if (!match) return null;
+  return [Number(match[1]), Number(match[2]), Number(match[3] ?? 0)];
+}
+
+function compareVersions(a, b) {
+  return a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+}
+
+const interpreterProbes = {
+  bash: ['bash', ['--version']],
+  python3: ['python3', ['--version']],
+  node: ['node', ['--version']],
+  bun: ['bun', ['--version']],
+};
+
+async function checkInterpreters(source) {
+  const runtimes = await readJson(join(source, managedRoot, 'policy', 'runtimes.json'));
+  const required = runtimes.interpreters ?? {};
+  const issues = [];
+  for (const [name, spec] of Object.entries(required)) {
+    const probe = interpreterProbes[name];
+    const want = parseVersionSpec(spec);
+    if (!probe || !want) { issues.push(`interpreter policy has an unsupported entry: ${name}`); continue; }
+    const result = spawnSync(probe[0], probe[1], { encoding: 'utf8' });
+    if (result.error || result.status !== 0) {
+      issues.push(`${name}: required (${spec}) but not runnable on PATH`);
+      continue;
+    }
+    const have = parseVersionSpec(`${result.stdout}${result.stderr}`);
+    if (!have) { issues.push(`${name}: could not parse a version from its --version output`); continue; }
+    if (compareVersions(have, want) < 0) {
+      issues.push(`${name} ${have.join('.')} is older than the required ${spec}`);
+    }
+  }
+  return issues;
 }
 
 function renderTemplate(template, replacements) {
@@ -859,10 +902,12 @@ export async function runInstaller(argv, io = {}) {
       + links.filter((link) => link.create || link.replace).length;
 
     if (!install) {
+      const interpreterIssues = await checkInterpreters(options.source);
+      if (interpreterIssues.length > 0) throw new Error(interpreterIssues.join('; '));
       if (!state) throw new Error('install state is missing');
       if (changed > 0) throw new Error(`managed configuration drift: changes=${changed}`);
       await assertPriorState(options.home, state, instructions, settings, codexConfig, false);
-      stdout(`agent-workflows: check ok; instructions=${instructions.length}; links=${links.length}; settings=managed; codex-config=managed\n`);
+      stdout(`agent-workflows: check ok; interpreters=ok; instructions=${instructions.length}; links=${links.length}; settings=managed; codex-config=managed\n`);
       return 0;
     }
 

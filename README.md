@@ -1,10 +1,14 @@
-# dotfiles
+# agent-workflows-kit
 
-A portable agent-workflow kit plus the Mac shell, terminal, prompt and package
-setup around it. Machine-specific files ship as `.example` siblings; copy the
-one you need and keep your real version untracked.
+The policy, hooks and installer I use to run Claude Code and Codex as a fleet of agents on one Mac, with the rules that keep them honest:
 
-Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE).
+- **Versioned Claude Code hooks with `node:test` regression tests.** They guard git branches, block agent fan-out under memory pressure, flag completions claimed without evidence, and stop edits to the agent's own config.
+- **A drift-safe installer.** `install-agent-workflows.mjs --check` verifies interpreters, file hashes and settings without writing anything. `--install` writes an owner-only rollback bundle.
+- **The long-run protocol.** A ledger format plus a validator that computes a program's progress from evidence-backed milestones, never from effort.
+
+Built by [Diego González Zapiain](https://dgonzap30.github.io/) at [Lojik Labs](https://wearelojik.com). Licensed [Apache-2.0](LICENSE).
+
+It still ships the Mac shell, terminal and prompt setup around it. Machine-specific files ship as `.example` siblings; copy the one you need and keep your real version untracked.
 
 ## What's in here
 
